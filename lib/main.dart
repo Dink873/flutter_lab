@@ -42,7 +42,7 @@ class _RandomNumberGeneratorState extends State<RandomNumberGenerator>
   }
 
   void _generateRandomNumber() {
-    _controller.forward(from: 0.0);
+    _controller.forward(from: 0);
     setState(() {
       _randomNumber = _random.nextInt(100) + 1;
     });
@@ -51,8 +51,9 @@ class _RandomNumberGeneratorState extends State<RandomNumberGenerator>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Генератор випадкових чисел")), // Додано зміну для тесту
-
+      appBar: AppBar(
+        title: const Text('Генеератор випадкових чисел'),
+      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -87,7 +88,7 @@ class _RandomNumberGeneratorState extends State<RandomNumberGenerator>
                   borderRadius: BorderRadius.circular(30),
                 ),
               ),
-              child: const Text("Згенерувати", style: TextStyle(fontSize: 20)),
+              child: const Text('Згенерувати', style: TextStyle(fontSize: 20)),
             ),
           ],
         ),
