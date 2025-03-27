@@ -51,8 +51,9 @@ class _RandomNumberGeneratorState extends State<RandomNumberGenerator>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Генератор випадкових чисел")), // Додано зміну для тесту
-
+      appBar: AppBar(
+        title: const Text("Генеератор випадкових чисел"),
+      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
