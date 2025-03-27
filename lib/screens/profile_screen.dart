@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -13,7 +14,9 @@ class ProfileScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.edit),
             onPressed: () {
-              print('Редагування профілю');
+              if (kDebugMode) {
+                print('Редагування профілю');
+              }
             },
           ),
         ],
@@ -29,9 +32,8 @@ class ProfileScreen extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(24),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              CircleAvatar(
+              const CircleAvatar(
                 radius: 70,
                 backgroundImage: NetworkImage(
                   'https://www.example.com/profile.jpg',
@@ -55,7 +57,9 @@ class ProfileScreen extends StatelessWidget {
               const SizedBox(height: 32),
               ElevatedButton.icon(
                 onPressed: () {
-                  print("Зміна пароля");
+                  if (kDebugMode) {
+                    print('Зміна пароля');
+                  }
                 },
                 icon: const Icon(Icons.lock, color: Colors.white),
                 style: ElevatedButton.styleFrom(

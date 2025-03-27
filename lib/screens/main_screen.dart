@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class MainScreen extends StatelessWidget {
@@ -42,7 +43,9 @@ class MainScreen extends StatelessWidget {
               const SizedBox(height: 32),
               ElevatedButton.icon(
                 onPressed: () {
-                  print("Кавоварка включена");
+                  if (kDebugMode) {
+                    print('Кавоварка включена');
+                  }
                 },
                 icon: const Icon(Icons.coffee, color: Colors.white),
                 style: ElevatedButton.styleFrom(
@@ -63,7 +66,9 @@ class MainScreen extends StatelessWidget {
               const SizedBox(height: 20),
               ElevatedButton.icon(
                 onPressed: () {
-                  print("Налаштування кавоварки");
+                  if (kDebugMode) {
+                    print('Налаштування кавоварки');
+                  }
                 },
                 icon: const Icon(Icons.settings, color: Colors.white),
                 style: ElevatedButton.styleFrom(

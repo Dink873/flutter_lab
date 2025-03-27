@@ -42,7 +42,7 @@ class _RandomNumberGeneratorState extends State<RandomNumberGenerator>
   }
 
   void _generateRandomNumber() {
-    _controller.forward(from: 0.0);
+    _controller.forward(from: 0);
     setState(() {
       _randomNumber = _random.nextInt(100) + 1;
     });
@@ -52,7 +52,7 @@ class _RandomNumberGeneratorState extends State<RandomNumberGenerator>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Генеератор випадкових чисел"),
+        title: const Text('Генеератор випадкових чисел'),
       ),
       body: Center(
         child: Column(
@@ -88,7 +88,7 @@ class _RandomNumberGeneratorState extends State<RandomNumberGenerator>
                   borderRadius: BorderRadius.circular(30),
                 ),
               ),
-              child: const Text("Згенерувати", style: TextStyle(fontSize: 20)),
+              child: const Text('Згенерувати', style: TextStyle(fontSize: 20)),
             ),
           ],
         ),
