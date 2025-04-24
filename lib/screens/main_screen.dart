@@ -1,14 +1,56 @@
-import 'package:flutter/foundation.dart';
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class MainScreen extends StatelessWidget {
+class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
+
+  @override
+  State<MainScreen> createState() => _MainScreenState();
+}
+
+class _MainScreenState extends State<MainScreen> {
+  String? currentUserEmail;
+  String? deviceName;
+  String? temperature;
+  String? coffeeType;
+
+  @override
+  void initState() {
+    super.initState();
+    loadCurrentUser();
+  }
+
+  Future<void> loadCurrentUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    final email = prefs.getString('current_user_email');
+    final usersJson = prefs.getString('users');
+
+    setState(() {
+      currentUserEmail = email;
+    });
+
+    if (email != null && usersJson != null) {
+      final decoded = jsonDecode(usersJson);
+      if (decoded is Map<String, dynamic>) {
+        final user = decoded[email];
+        if (user != null && user is Map<String, dynamic>) {
+          final settings = user['settings'] ?? {};
+          setState(() {
+            deviceName = settings['deviceName']?.toString() ?? 'Моя кавоварка';
+            temperature = settings['temperature']?.toString() ?? 'Не вказано';
+            coffeeType = settings['coffeeType']?.toString() ?? 'Не вказано';
+          });
+        }
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Головна сторіінка'),
+        title: Text('Головна сторінка (${currentUserEmail ?? "гість"})'),
         backgroundColor: Colors.deepPurple,
         actions: [
           IconButton(
@@ -31,21 +73,30 @@ class MainScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text(
-                'Ласкаво просимо до розумної кавоварки!',
-                style: TextStyle(
+              Text(
+                currentUserEmail != null
+                    ? 'Вітаємо, $currentUserEmail!'
+                    : 'Ласкаво просимо до розумної кавоварки!',
+                style: const TextStyle(
                   fontSize: 26,
                   fontWeight: FontWeight.bold,
-                  color: Color.fromARGB(255, 255, 255, 255),
+                  color: Colors.white,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'Назва: ${deviceName ?? "-"}\nТемпература: ${temperature ?? "-"}\nТип кави: ${coffeeType ?? "-"}',
+                style: const TextStyle(
+                  fontSize: 18,
+                  color: Colors.white,
                 ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 32),
               ElevatedButton.icon(
                 onPressed: () {
-                  if (kDebugMode) {
-                    print('Кавоварка включена');
-                  }
+                  print('Кавоварка включена');
                 },
                 icon: const Icon(Icons.coffee, color: Colors.white),
                 style: ElevatedButton.styleFrom(
@@ -66,9 +117,7 @@ class MainScreen extends StatelessWidget {
               const SizedBox(height: 20),
               ElevatedButton.icon(
                 onPressed: () {
-                  if (kDebugMode) {
-                    print('Налаштування кавоварки');
-                  }
+                  Navigator.pushNamed(context, '/settings');
                 },
                 icon: const Icon(Icons.settings, color: Colors.white),
                 style: ElevatedButton.styleFrom(

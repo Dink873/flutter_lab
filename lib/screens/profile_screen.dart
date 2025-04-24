@@ -1,23 +1,71 @@
-import 'package:flutter/foundation.dart';
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
   @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  Map<String, dynamic>? currentUser;
+
+  @override
+  void initState() {
+    super.initState();
+    loadCurrentUser();
+  }
+
+  Future<void> loadCurrentUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    final email = prefs.getString('current_user_email');
+    final usersJson = prefs.getString('users');
+
+    if (usersJson != null && email != null) {
+      final decoded = jsonDecode(usersJson);
+      if (decoded is Map<String, dynamic>) {
+        final user = decoded[email];
+        if (user != null && user is Map<String, dynamic>) {
+          setState(() {
+            currentUser = Map<String, dynamic>.from(user);
+            currentUser!['email'] = email;
+          });
+        }
+      }
+    }
+  }
+
+  Future<void> logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('current_user_email');
+    await prefs.setBool('isLoggedIn', false);
+
+    if (mounted) {
+      Navigator.pushReplacementNamed(context, '/login');
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (currentUser == null) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    final email = currentUser!['email'] as String? ?? 'Email не доступний';
+    final name = currentUser!['name'] as String? ?? 'Ім’я не вказано';
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Профіль'),
         backgroundColor: Colors.deepPurple,
         actions: [
           IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: () {
-              if (kDebugMode) {
-                print('Редагування профілю');
-              }
-            },
+            icon: const Icon(Icons.logout),
+            onPressed: logout,
           ),
         ],
       ),
@@ -35,33 +83,29 @@ class ProfileScreen extends StatelessWidget {
             children: [
               const CircleAvatar(
                 radius: 70,
-                backgroundImage: NetworkImage(
-                  'https://www.example.com/profile.jpg',
-                ),
-                backgroundColor: Colors.white,
+                backgroundImage: NetworkImage('https://www.example.com/profile.jpg'),
               ),
               const SizedBox(height: 24),
-              const Text(
-                'Ім\'я користувача',
-                style: TextStyle(
+              Text(
+                name,
+                style: const TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
                   color: Colors.tealAccent,
                 ),
               ),
               const SizedBox(height: 8),
-              const Text(
-                'example@email.com',
-                style: TextStyle(fontSize: 18, color: Colors.white70),
+              Text(
+                email,
+                style: const TextStyle(fontSize: 18, color: Colors.white70),
               ),
               const SizedBox(height: 32),
               ElevatedButton.icon(
                 onPressed: () {
-                  if (kDebugMode) {
-                    print('Зміна пароля');
-                  }
+                  // Тут можна додати редагування профілю
+                  print('Редагування профілю');
                 },
-                icon: const Icon(Icons.lock, color: Colors.white),
+                icon: const Icon(Icons.edit, color: Colors.white),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.deepPurple,
                   padding: const EdgeInsets.symmetric(
@@ -73,15 +117,13 @@ class ProfileScreen extends StatelessWidget {
                   ),
                 ),
                 label: const Text(
-                  'Змінитии пароль',
+                  'Редагувати профіль',
                   style: TextStyle(fontSize: 18),
                 ),
               ),
               const SizedBox(height: 24),
               ElevatedButton.icon(
-                onPressed: () {
-                  Navigator.pushNamed(context, '/login');
-                },
+                onPressed: logout,
                 icon: const Icon(Icons.logout, color: Colors.white),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.redAccent,
