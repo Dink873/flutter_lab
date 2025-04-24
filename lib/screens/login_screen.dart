@@ -104,7 +104,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     if (_errorMessage != null)
                       Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.only(top: 10),
                         child: Text(
                           _errorMessage!,
                           style: const TextStyle(color: Colors.red),
@@ -120,17 +120,14 @@ class _LoginScreenState extends State<LoginScreen> {
                           borderRadius: BorderRadius.circular(15),
                         ),
                       ),
-                      child: const Text(
-                        'Увійти',
-                        style: TextStyle(fontSize: 18, color: Colors.white),
-                      ),
+                      child: const Text('Увійти', style: TextStyle(fontSize: 18, color: Colors.white)),
                     ),
                     const SizedBox(height: 12),
                     TextButton(
                       onPressed: () => Navigator.pushNamed(context, '/register'),
                       child: const Text(
                         'Реєстрація',
-                        style: TextStyle(fontSize: 16, color: Colors.black),
+                        style: TextStyle(fontSize: 16, color: Colors.tealAccent),
                       ),
                     ),
                   ],
