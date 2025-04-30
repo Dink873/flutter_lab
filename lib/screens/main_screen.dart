@@ -35,7 +35,7 @@ class _MainScreenState extends State<MainScreen> {
       if (decoded is Map<String, dynamic>) {
         final user = decoded[email];
         if (user != null && user is Map<String, dynamic>) {
-          final settings = user['settings'] ?? {};
+          final settings = user['settings'] ?? <String,dynamic > {};
           setState(() {
             deviceName = settings['deviceName']?.toString() ?? 'Моя кавоварка';
             temperature = settings['temperature']?.toString() ?? 'Не вказано';
@@ -86,7 +86,8 @@ class _MainScreenState extends State<MainScreen> {
               ),
               const SizedBox(height: 20),
               Text(
-                'Назва: ${deviceName ?? "-"}\nТемпература: ${temperature ?? "-"}\nТип кави: ${coffeeType ?? "-"}',
+                'Назва: ${deviceName ?? "-"}\nТемпература: ${temperature ??
+                    "-"}\nТип кави: ${coffeeType ?? "-"}',
                 style: const TextStyle(
                   fontSize: 18,
                   color: Colors.white,
@@ -96,7 +97,7 @@ class _MainScreenState extends State<MainScreen> {
               const SizedBox(height: 32),
               ElevatedButton.icon(
                 onPressed: () {
-                  print('Кавоварка включена');
+                  debugPrint('Кавоварка включена');
                 },
                 icon: const Icon(Icons.coffee, color: Colors.white),
                 style: ElevatedButton.styleFrom(

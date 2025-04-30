@@ -6,10 +6,10 @@ class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  LoginScreenState createState() => LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   String? _errorMessage;
@@ -33,13 +33,13 @@ class _LoginScreenState extends State<LoginScreen> {
           if (!mounted) return;
           Navigator.pushReplacementNamed(context, '/main');
         } else {
-          setState(() => _errorMessage = "Невірний логін або пароль");
+          setState(() => _errorMessage = 'Невірний логін або пароль');
         }
       } else {
-        setState(() => _errorMessage = "Невірні дані користувачів");
+        setState(() => _errorMessage = 'Невірні дані користувачів');
       }
     } else {
-      setState(() => _errorMessage = "Немає зареєстрованих користувачів");
+      setState(() => _errorMessage = 'Немає зареєстрованих користувачів');
     }
   }
 
@@ -79,7 +79,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     TextField(
                       controller: _emailController,
                       decoration: InputDecoration(
-                        prefixIcon: const Icon(Icons.email, color: Colors.deepPurple),
+                        prefixIcon: const Icon(Icons.email,
+                            color: Colors.deepPurple,),
                         hintText: 'Email',
                         filled: true,
                         fillColor: Colors.white,
@@ -93,7 +94,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       controller: _passwordController,
                       obscureText: true,
                       decoration: InputDecoration(
-                        prefixIcon: const Icon(Icons.lock, color: Colors.deepPurple),
+                        prefixIcon: const Icon(Icons.lock,
+                          color: Colors.deepPurple,),
                         hintText: 'Пароль',
                         filled: true,
                         fillColor: Colors.white,
@@ -104,7 +106,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     if (_errorMessage != null)
                       Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.all(8),
                         child: Text(
                           _errorMessage!,
                           style: const TextStyle(color: Colors.red),
@@ -115,7 +117,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       onPressed: _login,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.deepPurple,
-                        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 28),
+                        padding: const EdgeInsets.symmetric(vertical: 14,
+                            horizontal: 28,),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(15),
                         ),

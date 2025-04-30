@@ -108,10 +108,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 icon: const Icon(Icons.edit, color: Colors.white),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.deepPurple,
-                  padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 28),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                  padding: const EdgeInsets.symmetric(vertical: 14,
+                      horizontal: 28,),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),),
                 ),
-                label: const Text('Редагувати профіль', style: TextStyle(fontSize: 18)),
+                label: const Text('Редагувати профіль',
+                    style: TextStyle(fontSize: 18),),
               ),
               const SizedBox(height: 24),
               ElevatedButton.icon(
@@ -119,8 +122,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 icon: const Icon(Icons.logout, color: Colors.white),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.redAccent,
-                  padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 28),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 14, horizontal: 28,),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),),
                 ),
                 label: const Text('Вийти', style: TextStyle(fontSize: 18)),
               ),

@@ -32,12 +32,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
       if (decoded is Map<String, dynamic>) {
         final user = decoded[email];
         if (user != null && user is Map<String, dynamic>) {
-          final settings = user['settings'] ?? {};
+          final settings = user['settings'] ?? <String, dynamic> {};
           setState(() {
             currentUserEmail = email;
-            _deviceController.text = settings['deviceName']?.toString() ?? '';
-            _temperatureController.text = settings['temperature']?.toString() ?? '';
-            _coffeeTypeController.text = settings['coffeeType']?.toString() ?? '';
+            _deviceController.text =
+                settings['deviceName']?.toString() ?? '';
+            _temperatureController.text =
+                settings['temperature']?.toString() ?? '';
+            _coffeeTypeController.text =
+                settings['coffeeType']?.toString() ?? '';
           });
         }
       }
@@ -117,7 +120,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               icon: const Icon(Icons.save, color: Colors.white),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.deepPurple,
-                padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 28),
+                padding: const EdgeInsets.symmetric(
+                    vertical: 14, horizontal: 28,),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15),
                 ),
