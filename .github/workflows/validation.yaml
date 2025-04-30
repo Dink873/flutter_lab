@@ -4,7 +4,7 @@ on:
   pull_request:
 
 env:
-  FLUTTER_VERSION: '3.24.5'
+  FLUTTER_VERSION: '3.29.2' # Обери потрібну версію
 
 jobs:
   analyze:
@@ -14,13 +14,13 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup Flutter ${{env.FLUTTER_VERSION}}
+      - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: ${{env.FLUTTER_VERSION}}
-          channel: 'stable'
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
 
-      - name: Flutter Pub Get
+      - name: Install dependencies
         run: flutter pub get
 
       - name: Run Dart Analysis
