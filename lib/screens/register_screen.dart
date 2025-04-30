@@ -1,6 +1,7 @@
 import 'dart:convert';
-import 'package:flutter/material.dart';
+
 import 'package:email_validator/email_validator.dart';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -74,21 +75,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 controller: _emailController,
                 decoration: const InputDecoration(labelText: 'Email'),
                 validator: (value) =>
-                EmailValidator.validate(value ?? '') ? null : 'Некоректний email',
+                EmailValidator.validate(value ?? '') ?
+                null : 'Некоректний email',
               ),
               TextFormField(
                 controller: _passwordController,
                 obscureText: true,
                 decoration: const InputDecoration(labelText: 'Пароль'),
                 validator: (value) =>
-                (value != null && value.length >= 6) ? null : 'Мінімум 6 символів',
+                (value != null && value.length >= 6) ?
+                null : 'Мінімум 6 символів',
               ),
               TextFormField(
                 controller: _confirmController,
                 obscureText: true,
-                decoration: const InputDecoration(labelText: 'Підтвердіть пароль'),
+                decoration: const InputDecoration(
+                    labelText: 'Підтвердіть пароль',),
                 validator: (value) =>
-                value == _passwordController.text ? null : 'Паролі не співпадають',
+                value == _passwordController.text ?
+                null : 'Паролі не співпадають',
               ),
               const SizedBox(height: 16),
               if (_errorMessage != null)

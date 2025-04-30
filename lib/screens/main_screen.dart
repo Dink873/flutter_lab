@@ -1,9 +1,10 @@
 import 'dart:convert';
-import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:my_project/data/mqtt_service.dart';
+
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/material.dart';
+import 'package:my_project/data/mqtt_service.dart';
 import 'package:my_project/utils/network_helper.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -16,7 +17,7 @@ class _MainScreenState extends State<MainScreen> {
   String? currentUserEmail;
   String deviceName = 'Моя кавоварка';
   String coffeeType = 'Не вказано';
-  double temperature = 0.0;
+  double temperature = 0;
 
   late MQTTService mqttService;
   bool hasInternet = true;
@@ -57,8 +58,10 @@ class _MainScreenState extends State<MainScreen> {
             final settings = user['settings'];
             if (settings is Map) {
               setState(() {
-                deviceName = settings['deviceName']?.toString() ?? 'Моя кавоварка';
-                coffeeType = settings['coffeeType']?.toString() ?? 'Не вказано';
+                deviceName = settings['deviceName']
+                    ?.toString() ?? 'Моя кавоварка';
+                coffeeType = settings['coffeeType']
+                    ?.toString() ?? 'Не вказано';
               });
             }
           }
@@ -81,7 +84,8 @@ class _MainScreenState extends State<MainScreen> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(internet ? 'Інтернет зʼєднання відновлено' : 'Немає Інтернету'),
+          content: Text(internet
+              ? 'Інтернет зʼєднання відновлено' : 'Немає Інтернету',),
           backgroundColor: internet ? Colors.green : Colors.red,
           duration: const Duration(seconds: 2),
         ),
@@ -123,7 +127,7 @@ class _MainScreenState extends State<MainScreen> {
           ),
         ],
       ),
-      body: Container(
+      body: DecoratedBox(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [Colors.indigo.shade500, Colors.purple.shade900],
@@ -150,7 +154,9 @@ class _MainScreenState extends State<MainScreen> {
                 ),
                 const SizedBox(height: 20),
                 Text(
-                  'Назва: $deviceName\nТемпература: ${temperature.toStringAsFixed(1)} °C\nТип кави: $coffeeType',
+                  'Назва: $deviceName\nТемпература: ${
+                      temperature.toStringAsFixed(1)
+                  } °C\nТип кави: $coffeeType',
                   style: const TextStyle(
                     fontSize: 18,
                     color: Colors.white,
@@ -167,7 +173,8 @@ class _MainScreenState extends State<MainScreen> {
                   icon: const Icon(Icons.coffee, color: Colors.white),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color.fromARGB(255, 144, 115, 194),
-                    padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 28),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 14, horizontal: 28,),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15),
                     ),
@@ -185,7 +192,8 @@ class _MainScreenState extends State<MainScreen> {
                   icon: const Icon(Icons.settings, color: Colors.white),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color.fromARGB(255, 163, 139, 204),
-                    padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 28),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 14, horizontal: 28,),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15),
                     ),

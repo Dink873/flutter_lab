@@ -1,22 +1,23 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:my_project/utils/network_helper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../utils/network_helper.dart'; // не забудь створити цей файл
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  LoginScreenState createState() => LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   String? _errorMessage;
 
   Future<void> _login() async {
     final hasConnection = await NetworkHelper.hasInternetConnection();
+    if (!mounted) return;
 
     if (!hasConnection) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -29,7 +30,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     final prefs = await SharedPreferences.getInstance();
-    final String? usersJson = prefs.getString('users');
+    final usersJson = prefs.getString('users');
 
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
@@ -45,14 +46,15 @@ class _LoginScreenState extends State<LoginScreen> {
           await prefs.setString('current_user_email', email);
           if (!mounted) return;
           Navigator.pushReplacementNamed(context, '/main');
+          return;
         } else {
-          setState(() => _errorMessage = "Невірний логін або пароль");
+          setState(() => _errorMessage = 'Невірний логін або пароль');
         }
       } else {
-        setState(() => _errorMessage = "Невірні дані користувачів");
+        setState(() => _errorMessage = 'Невірні дані користувачів');
       }
     } else {
-      setState(() => _errorMessage = "Немає зареєстрованих користувачів");
+      setState(() => _errorMessage = 'Немає зареєстрованих користувачів');
     }
   }
 
@@ -92,7 +94,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     TextField(
                       controller: _emailController,
                       decoration: InputDecoration(
-                        prefixIcon: const Icon(Icons.email, color: Colors.deepPurple),
+                        prefixIcon: const Icon(Icons.email,
+                            color: Colors.deepPurple,),
                         hintText: 'Email',
                         filled: true,
                         fillColor: Colors.white,
@@ -106,7 +109,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       controller: _passwordController,
                       obscureText: true,
                       decoration: InputDecoration(
-                        prefixIcon: const Icon(Icons.lock, color: Colors.deepPurple),
+                        prefixIcon: const Icon(Icons.lock,
+                            color: Colors.deepPurple,),
                         hintText: 'Пароль',
                         filled: true,
                         fillColor: Colors.white,
@@ -117,7 +121,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     if (_errorMessage != null)
                       Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.all(8),
                         child: Text(
                           _errorMessage!,
                           style: const TextStyle(color: Colors.red),
@@ -128,22 +132,28 @@ class _LoginScreenState extends State<LoginScreen> {
                       onPressed: _login,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.deepPurple,
-                        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 28),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 14, horizontal: 28,),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(15),
                         ),
                       ),
                       child: const Text(
                         'Увійти',
-                        style: TextStyle(fontSize: 18, color: Colors.white),
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 12),
                     TextButton(
-                      onPressed: () => Navigator.pushNamed(context, '/register'),
+                      onPressed: () =>
+                          Navigator.pushNamed(context, '/register'),
                       child: const Text(
                         'Реєстрація',
-                        style: TextStyle(fontSize: 16, color: Colors.black),
+                        style:
+                        TextStyle(fontSize: 16, color: Colors.black),
                       ),
                     ),
                   ],
