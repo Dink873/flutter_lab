@@ -39,12 +39,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> logout() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('current_user_email');
-    await prefs.setBool('isLoggedIn', false);
+    final shouldLogout = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Підтвердження'),
+        content: const Text('Ви дійсно хочете вийти?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Ні'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Так'),
+          ),
+        ],
+      ),
+    );
 
-    if (mounted) {
-      Navigator.pushReplacementNamed(context, '/login');
+    if (shouldLogout == true) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('current_user_email');
+      await prefs.setBool('isLoggedIn', false);
+
+      if (mounted) {
+        Navigator.pushReplacementNamed(context, '/login');
+      }
     }
   }
 
@@ -103,7 +123,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               const SizedBox(height: 32),
               ElevatedButton.icon(
                 onPressed: () {
-
+                  // Тут може бути логіка редагування профілю
                 },
                 icon: const Icon(Icons.edit, color: Colors.white),
                 style: ElevatedButton.styleFrom(
