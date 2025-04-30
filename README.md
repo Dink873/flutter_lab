@@ -1,3 +1,3 @@
 # flutter_lab
-flutter 1 lab  
-generator random numbers
+flutter 3 lab  
+rozumna kavovarka

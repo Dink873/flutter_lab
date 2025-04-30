@@ -1,96 +1,38 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_project/screens/login_screen.dart';
+import 'package:my_project/screens/main_screen.dart';
+import 'package:my_project/screens/profile_screen.dart';
+import 'package:my_project/screens/register_screen.dart';
+import 'package:my_project/screens/setting_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final prefs = await SharedPreferences.getInstance();
+  final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+
+  runApp(MyApp(isLoggedIn: isLoggedIn));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final bool isLoggedIn;
+
+  const MyApp({required this.isLoggedIn, super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData.dark(),
-      home: const RandomNumberGenerator(),
-    );
-  }
-}
-
-class RandomNumberGenerator extends StatefulWidget {
-  const RandomNumberGenerator({super.key});
-
-  @override
-  State<RandomNumberGenerator> createState() => _RandomNumberGeneratorState();
-}
-
-class _RandomNumberGeneratorState extends State<RandomNumberGenerator>
-    with SingleTickerProviderStateMixin {
-  int _randomNumber = 0;
-  final Random _random = Random();
-  late AnimationController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 300),
-    );
-  }
-
-  void _generateRandomNumber() {
-    _controller.forward(from: 0.0);
-    setState(() {
-      _randomNumber = _random.nextInt(100) + 1;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Генератор випадкових чисел")),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            AnimatedBuilder(
-              animation: _controller,
-              builder: (context, child) {
-                return Transform.scale(
-                  scale: 1 + _controller.value * 0.2,
-                  child: Text(
-                    _randomNumber.toString(),
-                    style: GoogleFonts.robotoMono(
-                      fontSize: 80,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blueAccent,
-                    ),
-                  ),
-                );
-              },
-            ),
-            const SizedBox(height: 40),
-            ElevatedButton(
-              onPressed: _generateRandomNumber,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueAccent,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 30,
-                  vertical: 15,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
-                ),
-              ),
-              child: const Text("Згенерувати", style: TextStyle(fontSize: 20)),
-            ),
-          ],
-        ),
-      ),
+      title: 'Smart Coffee',
+      theme: ThemeData(primarySwatch: Colors.brown),
+      initialRoute: isLoggedIn ? '/main' : '/login',
+      routes: {
+        '/login': (context) => const LoginScreen(),
+        '/register': (context) => const RegisterScreen(),
+        '/main': (context) => const MainScreen(),
+        '/profile': (context) => const ProfileScreen(),
+        '/settings': (context) => const SettingsScreen(),
+      },
     );
   }
 }

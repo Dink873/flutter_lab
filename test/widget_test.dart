@@ -1,21 +1,25 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter/material.dart';
 import 'package:my_project/main.dart';
+import 'package:my_project/screens/login_screen.dart';
+import 'package:my_project/screens/main_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
-  testWidgets('Перевірка генерації випадкового числа', (
-    WidgetTester tester,
-  ) async {
-    await tester.pumpWidget(const MyApp());
+  testWidgets('Navigation based on login status', (WidgetTester tester) async {
+    final prefs = await SharedPreferences.getInstance();
 
-    expect(find.byType(Text), findsWidgets);
+    await prefs.setBool('isLoggedIn', false);
 
-    final button = find.text("Згенерувати");
-    expect(button, findsOneWidget);
+    await tester.pumpWidget(const MyApp(isLoggedIn: false));
 
-    await tester.tap(button);
-    await tester.pump();
+    expect(find.byType(LoginScreen), findsOneWidget);
+    expect(find.byType(MainScreen), findsNothing);
 
-    expect(find.byType(Text), findsWidgets);
+    await prefs.setBool('isLoggedIn', true);
+
+    await tester.pumpWidget(const MyApp(isLoggedIn: true));
+
+    expect(find.byType(MainScreen), findsOneWidget);
+    expect(find.byType(LoginScreen), findsNothing);
   });
 }
