@@ -1,4 +1,4 @@
-// lib/profile/profile_screen.dart
+// lib/screens/profile_screen.dart
 import 'dart:convert';
 import 'dart:isolate';
 
@@ -76,18 +76,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> logout() async {
+    final navigator = Navigator.of(context);
+
     final shouldLogout = await showDialog<bool?>(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Text('Підтвердження'),
         content: const Text('Ви дійсно хочете вийти?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
+            onPressed: () => navigator.pop(false),
             child: const Text('Ні'),
           ),
           TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
+            onPressed: () => navigator.pop(true),
             child: const Text('Так'),
           ),
         ],
@@ -99,15 +101,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
       await prefs.remove('current_user_email');
       await prefs.setBool('isLoggedIn', false);
 
-      if (mounted) {
-        Navigator.pushReplacementNamed(context, '/login');
-      }
+      if (!mounted) return;
+      navigator.pushReplacementNamed('/login');
     }
   }
 
   Future<void> scanQrAndSend() async {
-    final scannedText = await Navigator.push<String>(
-      context,
+    final navigator = Navigator.of(context);
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+
+    final scannedText = await navigator.push<String>(
       MaterialPageRoute(builder: (_) => QRScannerScreen()),
     );
 
@@ -118,10 +121,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
         await usbManager.sendData('$scannedText\n');
 
-        ScaffoldMessenger.of(context).showSnackBar(
+        if (!mounted) return;
+        scaffoldMessenger.showSnackBar(
           SnackBar(content: Text('✅ QR надіслано: $scannedText')),
         );
       } catch (e) {
+        if (!mounted) return;
         await showDialog<void>(
           context: context,
           builder: (_) => AlertDialog(
@@ -175,7 +180,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
             children: [
               const CircleAvatar(
                 radius: 70,
-                backgroundImage: NetworkImage('https://www.example.com/profile.jpg'),
+                backgroundImage: NetworkImage(
+                  'https://www.example.com/profile.jpg',
+                ),
               ),
               const SizedBox(height: 24),
               Text(
@@ -202,10 +209,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 icon: const Icon(Icons.qr_code_scanner, color: Colors.white),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
-                  padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 28),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 14,
+                    horizontal: 28,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
                 ),
-                label: const Text('Сканувати QR-код', style: TextStyle(fontSize: 18)),
+                label: const Text(
+                  'Сканувати QR-код',
+                  style: TextStyle(fontSize: 18),
+                ),
               ),
               const SizedBox(height: 24),
               ElevatedButton.icon(
@@ -213,10 +228,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 icon: const Icon(Icons.logout, color: Colors.white),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.redAccent,
-                  padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 28),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 14,
+                    horizontal: 28,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
                 ),
-                label: const Text('Вийти', style: TextStyle(fontSize: 18)),
+                label: const Text(
+                  'Вийти',
+                  style: TextStyle(fontSize: 18),
+                ),
               ),
             ],
           ),

@@ -1,5 +1,5 @@
-import 'package:rxdart/rxdart.dart';
 import 'package:my_project/usb/usb_service.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:usb_serial/usb_serial.dart';
 
 class UsbManager {
