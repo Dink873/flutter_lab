@@ -1,9 +1,10 @@
 import 'dart:convert';
+
+import 'package:my_project/data/local_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'local_storage.dart';
 
 class SharedPrefsStorage implements LocalStorage {
-  final String key = "users";
+  final String key = 'users';
 
   @override
   Future<void> saveUser(Map<String, dynamic> user) async {
@@ -16,8 +17,7 @@ class SharedPrefsStorage implements LocalStorage {
       final decoded = jsonDecode(usersJson);
       if (decoded is List) {
         users = decoded
-            .whereType<Map>()
-            .map((item) => Map<String, dynamic>.from(item as Map))
+            .whereType<Map<String, dynamic>>()
             .toList();
       }
     }
@@ -38,8 +38,7 @@ class SharedPrefsStorage implements LocalStorage {
     final decoded = jsonDecode(usersJson);
     if (decoded is List) {
       return decoded
-          .whereType<Map>()
-          .map((item) => Map<String, dynamic>.from(item as Map))
+          .whereType<Map<String, dynamic>>()
           .toList();
     }
 
@@ -48,7 +47,6 @@ class SharedPrefsStorage implements LocalStorage {
 
   @override
   Future<Map<String, dynamic>?> getUser() async {
-
     return null;
   }
 

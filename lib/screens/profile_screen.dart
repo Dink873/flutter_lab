@@ -25,6 +25,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     if (usersJson != null && email != null) {
       final decoded = jsonDecode(usersJson);
+
       if (decoded is Map<String, dynamic>) {
         final user = decoded[email];
         if (user != null && user is Map<String, dynamic>) {
@@ -38,12 +39,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> logout() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('current_user_email');
-    await prefs.setBool('isLoggedIn', false);
+    final shouldLogout = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Підтвердження'),
+        content: const Text('Ви дійсно хочете вийти?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Ні'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Так'),
+          ),
+        ],
+      ),
+    );
 
-    if (mounted) {
-      Navigator.pushReplacementNamed(context, '/login');
+    if (shouldLogout == true) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('current_user_email');
+      await prefs.setBool('isLoggedIn', false);
+
+      if (mounted) {
+        Navigator.pushReplacementNamed(context, '/login');
+      }
     }
   }
 
@@ -87,7 +108,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               const SizedBox(height: 24),
               Text(
-                name,
+                email,
                 style: const TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
@@ -96,30 +117,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                email,
+                name,
                 style: const TextStyle(fontSize: 18, color: Colors.white70),
               ),
               const SizedBox(height: 32),
               ElevatedButton.icon(
                 onPressed: () {
-                  // Тут можна додати редагування профілю
-                  print('Редагування профілю');
+                  // Тут може бути логіка редагування профілю
                 },
                 icon: const Icon(Icons.edit, color: Colors.white),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.deepPurple,
                   padding: const EdgeInsets.symmetric(
-                    vertical: 14,
-                    horizontal: 28,
-                  ),
+                      vertical: 14, horizontal: 28,),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
-                  ),
+                      borderRadius: BorderRadius.circular(15),),
                 ),
-                label: const Text(
-                  'Редагувати профіль',
-                  style: TextStyle(fontSize: 18),
-                ),
+                label: const Text('Редагувати профіль', style: TextStyle(
+                    fontSize: 18,),),
               ),
               const SizedBox(height: 24),
               ElevatedButton.icon(
@@ -128,12 +143,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.redAccent,
                   padding: const EdgeInsets.symmetric(
-                    vertical: 14,
-                    horizontal: 28,
-                  ),
+                      vertical: 14, horizontal: 28,),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
-                  ),
+                      borderRadius: BorderRadius.circular(15),),
                 ),
                 label: const Text('Вийти', style: TextStyle(fontSize: 18)),
               ),
