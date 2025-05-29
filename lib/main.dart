@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           title: 'Smart Coffee',
           theme: ThemeData(primarySwatch: Colors.brown),
-          home: const AppNavigator(), // ДОДАЙ const тут
+          home: const AppNavigator(),
           routes: {
             '/login': (context) => const LoginScreen(),
             '/register': (context) => const RegisterScreen(),

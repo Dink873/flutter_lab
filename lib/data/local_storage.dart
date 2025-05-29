@@ -45,7 +45,6 @@ class SharedPrefsStorage implements LocalStorage {
     final user = decoded is Map
         ? Map<String, dynamic>.from(decoded)
         : <String, dynamic>{};
-    // Тут settings вже гарантовано Map<String, dynamic>
     user['settings'] = Map<String, dynamic>.from(settings);
     await prefs.setString(userKey, jsonEncode(user));
   }

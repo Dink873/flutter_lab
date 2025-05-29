@@ -66,7 +66,6 @@ class _MainScreenState extends State<MainScreen> {
     return BlocBuilder<UserCubit, UserState>(
       builder: (context, state) {
         String? currentUserEmail;
-        // Витягуємо deviceName та coffeeType з User.settings, якщо вони є
         if (state is UserLoaded) {
           currentUserEmail = state.user.email;
           final settings = state.user.settings;

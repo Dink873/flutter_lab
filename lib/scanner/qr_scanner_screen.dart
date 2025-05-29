@@ -63,7 +63,6 @@ class QRScannerScreen extends StatelessWidget {
     );
   }
 
-  // --- Головна відмінність тут: pop тільки після всіх SnackBar'ів! ---
   @override
   Widget build(BuildContext context) {
     return Scaffold(
