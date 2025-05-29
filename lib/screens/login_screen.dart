@@ -1,64 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_project/cubit/user_cubit.dart';
-import 'package:my_project/utils/network_helper.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
 
   @override
-  LoginScreenState createState() => LoginScreenState();
-}
-
-class LoginScreenState extends State<LoginScreen> {
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _login() async {
-    final hasConnection = await NetworkHelper.hasInternetConnection();
-    if (!mounted) return;
-
-    if (!hasConnection) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Немає підключення до Інтернету'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-
-    if (_emailController.text.trim().isEmpty ||
-        _passwordController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Email та пароль не можуть бути порожніми!'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-
-    context.read<UserCubit>().login(
-      _emailController.text.trim(),
-      _passwordController.text.trim(),
-    );
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final emailController = TextEditingController();
+    final passwordController = TextEditingController();
+
     return Scaffold(
       body: DecoratedBox(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.indigo.shade500, Colors.purple.shade900],
+            colors: [
+              Colors.indigo.shade500,
+              Colors.purple.shade900,
+            ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -100,7 +59,7 @@ class LoginScreenState extends State<LoginScreen> {
                         ),
                         const SizedBox(height: 30),
                         TextField(
-                          controller: _emailController,
+                          controller: emailController,
                           decoration: InputDecoration(
                             prefixIcon: const Icon(
                               Icons.email,
@@ -116,7 +75,7 @@ class LoginScreenState extends State<LoginScreen> {
                         ),
                         const SizedBox(height: 16),
                         TextField(
-                          controller: _passwordController,
+                          controller: passwordController,
                           obscureText: true,
                           decoration: InputDecoration(
                             prefixIcon: const Icon(
@@ -135,7 +94,14 @@ class LoginScreenState extends State<LoginScreen> {
                         if (state is UserLoading)
                           const CircularProgressIndicator(),
                         ElevatedButton(
-                          onPressed: (state is UserLoading) ? null : _login,
+                          onPressed: (state is UserLoading)
+                              ? null
+                              : () {
+                            context.read<UserCubit>().login(
+                              emailController.text.trim(),
+                              passwordController.text.trim(),
+                            );
+                          },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.deepPurple,
                             padding: const EdgeInsets.symmetric(
@@ -158,7 +124,9 @@ class LoginScreenState extends State<LoginScreen> {
                         TextButton(
                           onPressed: (state is UserLoading)
                               ? null
-                              : () => Navigator.pushNamed(context, '/register'),
+                              : () {
+                            Navigator.pushNamed(context, '/register');
+                          },
                           child: const Text(
                             'Реєстрація',
                             style: TextStyle(

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:my_project/usb/usb_service.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:usb_serial/usb_serial.dart';
@@ -8,11 +9,13 @@ class UsbManager {
   }
 
   final BaseUsbService service;
+
   final _cachedDevice = BehaviorSubject<List<UsbDevice>>.seeded([]);
   final _cachedPort = BehaviorSubject<UsbPort?>();
   final _cachedRate = BehaviorSubject<int>.seeded(115200);
 
   Stream<List<UsbDevice>> get device => _cachedDevice.stream;
+  List<UsbDevice> get deviceList => _cachedDevice.value;
   UsbPort? get port => _cachedPort.valueOrNull;
 
   Future<void> refreshDeviceList() async {
@@ -26,7 +29,6 @@ class UsbManager {
       await refreshDeviceList();
       devices = _cachedDevice.value;
     }
-
     if (devices.isEmpty) {
       return null;
     }
@@ -37,7 +39,6 @@ class UsbManager {
       devices.first,
       rate: _cachedRate.value,
     );
-
     _cachedPort.add(port);
     return port;
   }
@@ -47,6 +48,9 @@ class UsbManager {
     if (port != null) {
       await service.sendData(port, data: data);
     } else {
+      if (kDebugMode) {
+        print('USB port is not open! Cannot send data.');
+      }
     }
   }
 

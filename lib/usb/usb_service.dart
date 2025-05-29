@@ -5,6 +5,7 @@ abstract class BaseUsbService {
   Future<List<UsbDevice>> getDeviceList();
   Future<UsbPort?> connectToDevice(UsbDevice device, {int rate = 115200});
   Future<void> sendData(UsbPort? port, {required String data});
+  Future<void> closePort(UsbPort? port);
 }
 
 class UsbService extends BaseUsbService {
@@ -14,8 +15,10 @@ class UsbService extends BaseUsbService {
   }
 
   @override
-  Future<UsbPort?> connectToDevice(UsbDevice device,
-      {int rate = 115200,}) async {
+  Future<UsbPort?> connectToDevice(
+      UsbDevice device, {
+        int rate = 115200,
+      }) async {
     final port = await device.create();
     final bool openResult = await port?.open() ?? false;
     if (!openResult) {
@@ -39,6 +42,13 @@ class UsbService extends BaseUsbService {
   Future<void> sendData(UsbPort? port, {required String data}) async {
     if (port != null) {
       await port.write(Uint8List.fromList(data.codeUnits));
+    } else {
+      debugPrint('❌ Порт не відкритий, не можу відправити дані');
     }
+  }
+
+  @override
+  Future<void> closePort(UsbPort? port) async {
+    await port?.close();
   }
 }

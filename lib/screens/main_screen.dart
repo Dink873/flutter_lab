@@ -1,104 +1,39 @@
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import 'package:my_project/cubit/user_cubit.dart';
-import 'package:my_project/data/mqtt_service.dart';
-import 'package:my_project/utils/network_helper.dart';
 
-class MainScreen extends StatefulWidget {
+class MainScreen extends StatelessWidget {
   const MainScreen({super.key});
-
-  @override
-  State<MainScreen> createState() => _MainScreenState();
-}
-
-class _MainScreenState extends State<MainScreen> {
-  String deviceName = 'Моя кавоварка';
-  String coffeeType = 'Не вказано';
-  double temperature = 0;
-  bool hasInternet = true;
-
-  late MQTTService mqttService;
-
-  @override
-  void initState() {
-    super.initState();
-    initMQTT();
-    monitorNetworkStatus();
-  }
-
-  void initMQTT() {
-    mqttService = MQTTService();
-    mqttService.onTemperatureReceived = (String value) {
-      setState(() {
-        temperature = double.tryParse(value) ?? 0.0;
-      });
-    };
-    mqttService.connect();
-  }
-
-  void monitorNetworkStatus() async {
-    final initialStatus = await NetworkHelper.hasInternetConnection();
-    setState(() => hasInternet = initialStatus);
-
-    Connectivity().onConnectivityChanged.listen((_) async {
-      final internet = await NetworkHelper.hasInternetConnection();
-      if (!mounted) return;
-      setState(() => hasInternet = internet);
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            internet
-                ? 'Інтернет зʼєднання відновлено'
-                : 'Немає Інтернету',
-          ),
-          backgroundColor: internet ? Colors.green : Colors.red,
-          duration: const Duration(seconds: 2),
-        ),
-      );
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<UserCubit, UserState>(
       builder: (context, state) {
+        String deviceName = 'Моя кавоварка';
+        String coffeeType = 'Не вказано';
+        double temperature = 0;
         String? currentUserEmail;
+
         if (state is UserLoaded) {
           currentUserEmail = state.user.email;
           final settings = state.user.settings;
           if (settings != null) {
             deviceName = settings['deviceName']?.toString() ?? deviceName;
             coffeeType = settings['coffeeType']?.toString() ?? coffeeType;
+            temperature = double.tryParse(
+              settings['temperature']?.toString() ?? '0',
+            ) ??
+                0.0;
           }
         }
 
         return Scaffold(
           appBar: AppBar(
-            title: Text('Головна (${currentUserEmail ?? "гість"})'),
+            title: Text(
+              'Головна (${currentUserEmail ?? "гість"})',
+            ),
             backgroundColor: Colors.deepPurple,
             actions: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: Row(
-                  children: [
-                    Icon(
-                      hasInternet ? Icons.wifi : Icons.wifi_off,
-                      color: hasInternet ? Colors.green : Colors.red,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      hasInternet ? 'Online' : 'Offline',
-                      style: TextStyle(
-                        color: hasInternet ? Colors.green : Colors.red,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
               IconButton(
                 icon: const Icon(Icons.account_circle),
                 onPressed: () {
@@ -151,7 +86,9 @@ class _MainScreenState extends State<MainScreen> {
                       onPressed: () {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text('Кавоварка увімкнена'),
+                            content: Text(
+                              'Кавоварка увімкнена',
+                            ),
                           ),
                         );
                       },

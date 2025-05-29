@@ -33,10 +33,10 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           title: 'Smart Coffee',
           theme: ThemeData(primarySwatch: Colors.brown),
-          home: const AppNavigator(),
+          home: const AppNavigator(), // <--- тут без const!
           routes: {
             '/login': (context) => const LoginScreen(),
-            '/register': (context) => const RegisterScreen(),
+            '/register': (context) => RegisterScreen(),
             '/main': (context) => const MainScreen(),
             '/profile': (context) => const ProfileScreen(),
             '/settings': (context) => const SettingsScreen(),
