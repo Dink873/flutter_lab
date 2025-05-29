@@ -30,6 +30,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  rxdart: ^0.27.7
+  usb_serial: ^0.3.0
+  mobile_scanner: ^3.0.0
   email_validator: ^2.0.1
   google_fonts: ^6.1.0
   shared_preferences: ^2.2.2
