@@ -7,14 +7,15 @@ import 'package:my_project/usb/usb_manager.dart';
 import 'package:my_project/usb/usb_service.dart';
 import 'package:usb_serial/usb_serial.dart';
 
-
 class QRScannerScreen extends StatelessWidget {
   QRScannerScreen({super.key});
 
   final UsbManager usbManager = UsbManager(UsbService());
 
-  Future<String> _waitForArduinoResponse(UsbPort port,
-      {Duration timeout = const Duration(seconds: 2),}) async {
+  Future<String> _waitForArduinoResponse(
+      UsbPort port, {
+        Duration timeout = const Duration(seconds: 2),
+      }) async {
     final completer = Completer<String>();
     String buffer = '';
     late StreamSubscription<Uint8List> sub;
@@ -27,13 +28,14 @@ class QRScannerScreen extends StatelessWidget {
       }
     });
 
-    return completer.future.timeout(timeout, onTimeout: () {
-      sub.cancel();
-      return '⏱ Arduino не відповів';
-    },
+    return completer.future.timeout(
+      timeout,
+      onTimeout: () {
+        sub.cancel();
+        return '⏱ Arduino не відповів';
+      },
     );
   }
-
 
   Future<void> _sendToArduino(BuildContext context, String code) async {
     final port = await usbManager.selectDevice();
@@ -61,17 +63,20 @@ class QRScannerScreen extends StatelessWidget {
     );
   }
 
+  // --- Головна відмінність тут: pop тільки після всіх SnackBar'ів! ---
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Сканування QR-коду')),
       body: MobileScanner(
-        onDetect: (capture) {
+        onDetect: (capture) async {
           final barcode = capture.barcodes.first;
           final code = barcode.rawValue;
           if (code != null) {
-            _sendToArduino(context, code);
-            Navigator.pop(context); // Закрити після сканування
+            await _sendToArduino(context, code);
+            if (context.mounted) {
+              Navigator.pop(context);
+            }
           }
         },
       ),

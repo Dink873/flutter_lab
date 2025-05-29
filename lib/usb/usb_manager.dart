@@ -31,6 +31,8 @@ class UsbManager {
       return null;
     }
 
+    await _cachedPort.valueOrNull?.close();
+
     final port = await service.connectToDevice(
       devices.first,
       rate: _cachedRate.value,
@@ -41,11 +43,17 @@ class UsbManager {
   }
 
   Future<void> sendData(String data) async {
-    await service.sendData(_cachedPort.valueOrNull, data: data);
+    final port = _cachedPort.valueOrNull;
+    if (port != null) {
+      await service.sendData(port, data: data);
+    } else {
+    }
   }
 
   Future<void> dispose() async {
     await _cachedPort.valueOrNull?.close();
-    _cachedPort.add(null);
+    await _cachedDevice.close();
+    await _cachedPort.close();
+    await _cachedRate.close();
   }
 }

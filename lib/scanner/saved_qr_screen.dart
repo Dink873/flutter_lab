@@ -23,20 +23,27 @@ class _SavedQrScreenState extends State<SavedQrScreen> {
     _readMessageFromArduino();
   }
 
+  @override
+  void dispose() {
+    usbManager.dispose();
+    super.dispose();
+  }
+
   Future<void> _readMessageFromArduino() async {
     setState(() => savedMessage = 'Зчитування...');
 
-    await usbManager.dispose();
     final port = await usbManager.selectDevice();
 
     if (port == null) {
-      setState(() => savedMessage = '❌ Arduino не знайдено');
+      if (mounted) {
+        setState(() => savedMessage = '❌ Arduino не знайдено');
+      }
       return;
     }
 
     await Future<void>.delayed(const Duration(milliseconds: 500));
-
     final response = await _readFromArduino(port);
+
     if (mounted) {
       setState(() => savedMessage = response);
     }

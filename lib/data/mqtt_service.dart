@@ -5,7 +5,6 @@ import 'package:mqtt_client/mqtt_server_client.dart';
 class MQTTService {
   late final MqttServerClient _client;
 
-  /// Callback для отримання температури
   void Function(String)? onTemperatureReceived;
 
   MQTTService() {

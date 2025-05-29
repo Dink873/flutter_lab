@@ -1,8 +1,7 @@
-import 'dart:convert';
-
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:my_project/cubit/user_cubit.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -24,33 +23,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
-
-    final prefs = await SharedPreferences.getInstance();
-    final usersRaw = prefs.getString('users');
-
-
-    Map<String, dynamic> users = {};
-
-    if (usersRaw != null) {
-      final dynamic decoded = jsonDecode(usersRaw);
-      if (decoded is Map<String, dynamic>) {
-        users = Map<String, dynamic>.from(decoded);
-      }
-    }
-
-    if (users.containsKey(email)) {
-      setState(() => _errorMessage = 'Користувач з таким email вже існує');
-      return;
-    }
-
-    users[email] = {'password': password};
-
-    await prefs.setString('users', jsonEncode(users));
-    await prefs.setBool('isLoggedIn', true);
-    await prefs.setString('current_user_email', email);
-
-    if (!mounted) return;
-    Navigator.pushReplacementNamed(context, '/main');
+    context.read<UserCubit>().register(email, password);
   }
 
   @override
@@ -67,44 +40,60 @@ class _RegisterScreenState extends State<RegisterScreen> {
       appBar: AppBar(title: const Text('Реєстрація')),
       body: Padding(
         padding: const EdgeInsets.all(20),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              TextFormField(
-                controller: _emailController,
-                decoration: const InputDecoration(labelText: 'Email'),
-                validator: (value) =>
-                EmailValidator.validate(value ?? '') ?
-                null : 'Некоректний email',
+        child: BlocConsumer<UserCubit, UserState>(
+          listener: (context, state) {
+            if (state is UserLoaded) {
+              Navigator.pushReplacementNamed(context, '/main');
+            } else if (state is UserError) {
+              setState(() {
+                _errorMessage = state.message;
+              });
+            }
+          },
+          builder: (context, state) {
+            return Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  TextFormField(
+                    controller: _emailController,
+                    decoration: const InputDecoration(labelText: 'Email'),
+                    validator: (value) =>
+                    EmailValidator.validate(value ?? '') ?
+                    null : 'Некоректний email',
+                  ),
+                  TextFormField(
+                    controller: _passwordController,
+                    obscureText: true,
+                    decoration: const InputDecoration(labelText: 'Пароль'),
+                    validator: (value) =>
+                    (value != null && value.length >= 6) ?
+                    null : 'Мінімум 6 символів',
+                  ),
+                  TextFormField(
+                    controller: _confirmController,
+                    obscureText: true,
+                    decoration: const InputDecoration(
+                      labelText: 'Підтвердіть пароль',),
+                    validator: (value) =>
+                    value == _passwordController.text ?
+                    null : 'Паролі не співпадають',
+                  ),
+                  const SizedBox(height: 16),
+                  if (_errorMessage != null)
+                    Text(_errorMessage!, style: const TextStyle
+                      (color: Colors.red),),
+                  const SizedBox(height: 20),
+                  if (state is UserLoading)
+                    const CircularProgressIndicator(),
+                  ElevatedButton(
+                    onPressed: (state is UserLoading) ? null : _register,
+                    child: const Text('Зареєструватися'),
+                  ),
+                ],
               ),
-              TextFormField(
-                controller: _passwordController,
-                obscureText: true,
-                decoration: const InputDecoration(labelText: 'Пароль'),
-                validator: (value) =>
-                (value != null && value.length >= 6) ?
-                null : 'Мінімум 6 символів',
-              ),
-              TextFormField(
-                controller: _confirmController,
-                obscureText: true,
-                decoration: const InputDecoration(
-                    labelText: 'Підтвердіть пароль',),
-                validator: (value) =>
-                value == _passwordController.text ?
-                null : 'Паролі не співпадають',
-              ),
-              const SizedBox(height: 16),
-              if (_errorMessage != null)
-                Text(_errorMessage!, style: const TextStyle(color: Colors.red)),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _register,
-                child: const Text('Зареєструватися'),
-              ),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );
