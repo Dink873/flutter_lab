@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_project/cubit/user_cubit.dart';
 import 'package:my_project/scanner/qr_scanner_screen.dart';
+import 'package:my_project/screens/dialogs.dart';
 import 'package:my_project/screens/profile_helpers.dart';
 import 'package:my_project/usb/usb_manager.dart';
 import 'package:my_project/usb/usb_service.dart';
