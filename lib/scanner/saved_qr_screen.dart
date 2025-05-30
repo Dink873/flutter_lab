@@ -2,57 +2,52 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_project/usb/usb_manager.dart';
 import 'package:my_project/usb/usb_service.dart';
 import 'package:usb_serial/usb_serial.dart';
 
-class SavedQrScreen extends StatefulWidget {
-  const SavedQrScreen({super.key});
+abstract class QrMessageState {}
 
-  @override
-  State<SavedQrScreen> createState() => _SavedQrScreenState();
+class QrInitial extends QrMessageState {}
+
+class QrLoading extends QrMessageState {}
+
+class QrLoaded extends QrMessageState {
+  final String message;
+  QrLoaded(this.message);
 }
 
-class _SavedQrScreenState extends State<SavedQrScreen> {
-  final UsbManager usbManager = UsbManager(UsbService());
-  String savedMessage = 'Зчитування...';
+class QrError extends QrMessageState {
+  final String error;
+  QrError(this.error);
+}
 
-  @override
-  void initState() {
-    super.initState();
-    _readMessageFromArduino();
-  }
+class QrMessageCubit extends Cubit<QrMessageState> {
+  QrMessageCubit() : super(QrInitial());
 
-  @override
-  void dispose() {
-    usbManager.dispose();
-    super.dispose();
-  }
-
-  Future<void> _readMessageFromArduino() async {
-    setState(() => savedMessage = 'Зчитування...');
-
-    final port = await usbManager.selectDevice();
-
-    if (port == null) {
-      if (mounted) {
-        setState(() => savedMessage = '❌ Arduino не знайдено');
+  Future<void> readMessage() async {
+    emit(QrLoading());
+    final usbManager = UsbManager(UsbService());
+    try {
+      final port = await usbManager.selectDevice();
+      if (port == null) {
+        await usbManager.dispose();
+        emit(QrError('❌ Arduino не знайдено'));
+        return;
       }
-      return;
-    }
-
-    await Future<void>.delayed(const Duration(milliseconds: 500));
-    final response = await _readFromArduino(port);
-
-    if (mounted) {
-      setState(() => savedMessage = response);
+      await Future<void>.delayed(const Duration(milliseconds: 500));
+      final response = await _readFromArduino(port);
+      await usbManager.dispose();
+      emit(QrLoaded(response));
+    } catch (e) {
+      emit(QrError('❌ ${e.toString()}'));
     }
   }
 
-  Future<String> _readFromArduino(UsbPort port) async {
-    final completer = Completer<String>();
+  static Future<String> _readFromArduino(UsbPort port) async {
     String buffer = '';
-
+    final completer = Completer<String>();
     StreamSubscription<Uint8List>? sub;
     sub = port.inputStream?.listen(
           (data) {
@@ -77,18 +72,46 @@ class _SavedQrScreenState extends State<SavedQrScreen> {
       },
     );
   }
+}
+
+class SavedQrScreen extends StatelessWidget {
+  const SavedQrScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Збережене повідомлення')),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Text(
-            savedMessage,
-            style: const TextStyle(fontSize: 20),
-            textAlign: TextAlign.center,
+    return BlocProvider<QrMessageCubit>(
+      create: (_) => QrMessageCubit()..readMessage(),
+      child: Scaffold(
+        appBar: AppBar(title: const Text('Збережене повідомлення')),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: BlocBuilder<QrMessageCubit, QrMessageState>(
+              builder: (context, state) {
+                if (state is QrLoading) {
+                  return const Text(
+                    'Зчитування...',
+                    style: TextStyle(fontSize: 20),
+                    textAlign: TextAlign.center,
+                  );
+                }
+                if (state is QrLoaded) {
+                  return Text(
+                    state.message,
+                    style: const TextStyle(fontSize: 20),
+                    textAlign: TextAlign.center,
+                  );
+                }
+                if (state is QrError) {
+                  return Text(
+                    state.error,
+                    style: const TextStyle(fontSize: 20, color: Colors.red),
+                    textAlign: TextAlign.center,
+                  );
+                }
+                return const SizedBox.shrink();
+              },
+            ),
           ),
         ),
       ),
