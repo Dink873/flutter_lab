@@ -25,15 +25,19 @@ class MyApp extends StatelessWidget {
           create: (_) => UserRepository(),
         ),
       ],
-      child: BlocProvider<UserCubit>(
-        create: (context) => UserCubit(
-          userRepository: RepositoryProvider.of<UserRepository>(context),
-        )..checkLoginStatus(),
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider<UserCubit>(
+            create: (context) => UserCubit(
+              userRepository: RepositoryProvider.of<UserRepository>(context),
+            )..checkLoginStatus(),
+          ),
+        ],
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'Smart Coffee',
           theme: ThemeData(primarySwatch: Colors.brown),
-          home: const AppNavigator(), // <--- тут без const!
+          home: const AppNavigator(),
           routes: {
             '/login': (context) => const LoginScreen(),
             '/register': (context) => RegisterScreen(),
