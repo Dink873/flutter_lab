@@ -4,7 +4,9 @@ import 'package:my_project/models/user.dart';
 class UserRepository {
   final LocalStorage storage;
 
-  UserRepository(this.storage);
+  UserRepository() : storage = SharedPrefsStorage();
+
+  UserRepository.withStorage(this.storage);
 
   Future<void> registerUser(User user) async {
     await storage.saveUser(user.toJson());
@@ -22,5 +24,9 @@ class UserRepository {
 
   Future<void> logout() async {
     await storage.clearUser();
+  }
+
+  Future<void> updateSettings(Map<String, dynamic> settings) async {
+    await storage.updateUserSettings(settings);
   }
 }

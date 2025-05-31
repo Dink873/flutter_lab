@@ -1,4 +1,3 @@
-// lib/mqtt/mqtt_isolate.dart
 import 'dart:isolate';
 
 void mqttWorker(SendPort sendPort) async {

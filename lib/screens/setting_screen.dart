@@ -1,100 +1,9 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:my_project/cubit/user_cubit.dart';
 
-class SettingsScreen extends StatefulWidget {
+class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
-
-  @override
-  State<SettingsScreen> createState() => _SettingsScreenState();
-}
-
-class _SettingsScreenState extends State<SettingsScreen> {
-  final _deviceController = TextEditingController();
-  final _temperatureController = TextEditingController();
-  final _coffeeTypeController = TextEditingController();
-
-  String? currentUserEmail;
-
-  @override
-  void initState() {
-    super.initState();
-    loadSettings();
-  }
-
-  Future<void> loadSettings() async {
-    final prefs = await SharedPreferences.getInstance();
-    final email = prefs.getString('current_user_email');
-    final String? usersJson = prefs.getString('users');
-
-    if (email != null && usersJson != null) {
-      final dynamic decoded = jsonDecode(usersJson);
-
-      if (decoded is List) {
-        final List<Map<String, dynamic>> users = decoded
-            .whereType<Map<String, dynamic>>()
-            .toList();
-
-        final user = users.firstWhere(
-              (u) => u['email'] == email,
-          orElse: () => <String, dynamic>{},
-        );
-
-        if (user.isNotEmpty) {
-          final settings = user['settings'] as Map<String, dynamic>? ?? {};
-
-          setState(() {
-            currentUserEmail = email;
-            _deviceController.text = settings['deviceName']
-                ?.toString() ?? '';
-            _temperatureController.text = settings['temperature']
-                ?.toString() ?? '';
-            _coffeeTypeController.text = settings['coffeeType']
-                ?.toString() ?? '';
-          });
-        }
-      }
-    }
-  }
-
-  Future<void> saveSettings() async {
-    final prefs = await SharedPreferences.getInstance();
-    final String? usersJson = prefs.getString('users');
-
-    if (currentUserEmail == null || usersJson == null) return;
-
-    final dynamic decoded = jsonDecode(usersJson);
-    if (decoded is List) {
-      final List<Map<String, dynamic>> users = decoded
-          .whereType<Map<String, dynamic>>()
-          .toList();
-
-      final int index = users.indexWhere((u) => u['email'] == currentUserEmail);
-      if (index != -1) {
-        users[index]['settings'] = {
-          'deviceName': _deviceController.text.trim(),
-          'temperature': _temperatureController.text.trim(),
-          'coffeeType': _coffeeTypeController.text.trim(),
-        };
-
-        await prefs.setString('users', jsonEncode(users));
-
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Settings saved')),
-          );
-        }
-      }
-    }
-  }
-
-  @override
-  void dispose() {
-    _deviceController.dispose();
-    _temperatureController.dispose();
-    _coffeeTypeController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -103,53 +12,86 @@ class _SettingsScreenState extends State<SettingsScreen> {
         title: const Text('Coffee Maker Settings'),
         backgroundColor: Colors.deepPurple,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: ListView(
-          children: [
-            TextField(
-              controller: _deviceController,
-              decoration: const InputDecoration(
-                labelText: 'Device Name',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _temperatureController,
-              decoration: const InputDecoration(
-                labelText: 'Temperature',
-                border: OutlineInputBorder(),
-              ),
-              keyboardType: TextInputType.number,
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _coffeeTypeController,
-              decoration: const InputDecoration(
-                labelText: 'Coffee Type',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton.icon(
-              onPressed: saveSettings,
-              icon: const Icon(Icons.save, color: Colors.white),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.deepPurple,
-                padding: const EdgeInsets.symmetric(
-                    vertical: 14, horizontal: 28,),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
+      body: BlocBuilder<UserCubit, UserState>(
+        builder: (context, state) {
+          if (state is UserLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          Map<String, dynamic> settings = {};
+          if (state is UserLoaded) {
+            settings = state.user.settings ?? {};
+          }
+
+          final deviceController = TextEditingController(
+              text: settings['deviceName']?.toString() ?? '',);
+          final temperatureController = TextEditingController(
+              text: settings['temperature']?.toString() ?? '',);
+          final coffeeTypeController = TextEditingController(
+              text: settings['coffeeType']?.toString() ?? '',);
+
+          void saveSettings() {
+            final updatedSettings = {
+              'deviceName': deviceController.text.trim(),
+              'temperature': temperatureController.text.trim(),
+              'coffeeType': coffeeTypeController.text.trim(),
+            };
+            context.read<UserCubit>().saveSettings(updatedSettings);
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Налаштування збережено')),
+            );
+          }
+
+          return Padding(
+            padding: const EdgeInsets.all(20),
+            child: ListView(
+              children: [
+                TextField(
+                  controller: deviceController,
+                  decoration: const InputDecoration(
+                    labelText: 'Device Name',
+                    border: OutlineInputBorder(),
+                  ),
                 ),
-              ),
-              label: const Text(
-                'Save Settings',
-                style: TextStyle(fontSize: 18, color: Colors.white),
-              ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: temperatureController,
+                  decoration: const InputDecoration(
+                    labelText: 'Temperature',
+                    border: OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType.number,
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: coffeeTypeController,
+                  decoration: const InputDecoration(
+                    labelText: 'Coffee Type',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton.icon(
+                  onPressed: saveSettings,
+                  icon: const Icon(Icons.save, color: Colors.white),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.deepPurple,
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 14, horizontal: 28,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                  ),
+                  label: const Text(
+                    'Save Settings',
+                    style: TextStyle(fontSize: 18, color: Colors.white),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
